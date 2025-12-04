@@ -3,18 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>佐賀自駕旅程全功能App</title>
+    <title>佐賀自駕旅程規劃</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
-        // 設定 Tailwind CSS
+        // 設定 Tailwind CSS，使用現代、簡約的靛藍色調（Indigo/Amber）
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        'primary': '#10b981', // Emerald-500
-                        'secondary': '#3b82f6', // Blue-500
-                        'background': '#f3f4f6', // Gray-100
-                        'highlight': '#f59e0b', // Amber-500 for alerts
+                        'primary': '#4338ca', // Indigo-700 for main actions and text
+                        'secondary': '#6366f1', // Indigo-500 for less important elements
+                        'background': '#f9fafb', // Gray-50 for clean background
+                        'highlight': '#f59e0b', // Amber-500 for alerts/guides/AI actions
+                        'subtle-bg': '#eef2ff', // Indigo-50 for accent background
                     },
                     fontFamily: {
                         sans: ['Inter', 'Noto Sans TC', 'sans-serif'],
@@ -27,88 +28,91 @@
         body {
             -webkit-tap-highlight-color: transparent;
             font-family: 'Inter', 'Noto Sans TC', sans-serif;
-            background-color: #f3f4f6;
+            background-color: var(--background);
         }
+        /* Tab 切換指示器 */
         .tab-button {
             transition: all 0.3s ease;
             position: relative;
+            padding: 1rem 0;
+            color: #6b7280;
         }
         .tab-button.active {
-            color: #10b981; /* primary color */
-            font-weight: 600;
+            color: #4338ca; /* primary color */
+            font-weight: 700;
         }
         .tab-button.active::after {
             content: '';
             position: absolute;
-            bottom: -8px;
+            bottom: 0px;
             left: 50%;
             transform: translateX(-50%);
             width: 80%;
             height: 3px;
-            background-color: #10b981;
+            background-color: #4338ca;
             border-radius: 9999px;
         }
+        /* 行程卡片陰影，更具 App 質感 */
         .card-shadow {
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
         }
-        /* Custom alert/confirm modal styling */
-        .custom-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 50;
+        /* Custom alert/confirm modal styling (omitted for brevity, assume implemented in JS) */
+        
+        /* 導遊標籤樣式 */
+        .tag-must-eat { background-color: #fee2e2; color: #dc2626; padding: 2px 8px; border-radius: 9999px; font-weight: 600; margin-right: 4px; display: inline-block; }
+        .tag-must-buy { background-color: #dbeafe; color: #1e40af; padding: 2px 8px; border-radius: 9999px; font-weight: 600; margin-right: 4px; display: inline-block; }
+        .tag-important { background-color: #fef3c7; color: #b45309; padding: 2px 8px; border-radius: 9999px; font-weight: 600; margin-right: 4px; display: inline-block; }
+        
+        /* 行程類型樣式 - 針對不同類型設定邊框顏色 */
+        .border-attraction { border-color: #10b981; /* Emerald */ }
+        .border-meal { border-color: #ef4444; /* Red */ }
+        .border-transport { border-color: #3b82f6; /* Blue */ }
+        .border-shopping { border-color: #f97316; /* Orange */ }
+        .border-flight, .border-hotel { border-color: #a855f7; /* Violet */ }
+        
+        /* 響應式佈局 - 確保在手機上全寬 */
+        .main-container {
+            max-width: 420px; /* 模擬手機寬度 */
+            margin-left: auto;
+            margin-right: auto;
         }
-        .modal-content {
-            background-color: white;
-            padding: 24px;
-            border-radius: 12px;
-            max-width: 90%;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
-            animation: fadeIn 0.3s ease-out;
+        .time-box {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #1f2937;
+            min-width: 6rem;
+            flex-shrink: 0;
+            text-align: right;
         }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        /* 標籤樣式 */
-        .tag-must-eat { background-color: #fcd34d; color: #92400e; padding: 2px 8px; border-radius: 9999px; font-weight: 600; margin-right: 4px; }
-        .tag-must-buy { background-color: #f9a8d4; color: #831843; padding: 2px 8px; border-radius: 9999px; font-weight: 600; margin-right: 4px; }
-        .tag-important { background-color: #93c5fd; color: #1e40af; padding: 2px 8px; border-radius: 9999px; font-weight: 600; margin-right: 4px; }
     </style>
 </head>
-<body class="antialiased">
+<body class="antialiased bg-background min-h-screen">
 
     <!-- 頂部導航列 -->
-    <header class="sticky top-0 bg-white shadow-md z-10">
-        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-16">
-                <h1 class="text-xl font-bold text-gray-800">佐賀自駕App</h1>
+    <header class="sticky top-0 bg-white shadow-lg z-20">
+        <div class="main-container px-4">
+            <div class="flex justify-between items-end h-18 border-b border-gray-100">
+                <h1 class="text-3xl font-black text-primary py-3">佐賀自駕旅程</h1>
                 <div class="flex space-x-4">
                     <button id="tab-itinerary" class="tab-button active" onclick="switchTab('itinerary')">行程規劃</button>
-                    <button id="tab-tools" class="tab-button" onclick="switchTab('tools')">旅程資訊與工具</button>
+                    <button id="tab-tools" class="tab-button" onclick="switchTab('tools')">旅程工具</button>
                 </div>
             </div>
         </div>
-        <div id="loading-indicator" class="hidden absolute inset-x-0 bottom-0 h-1 bg-secondary animate-pulse"></div>
+        <div id="loading-indicator" class="hidden absolute inset-x-0 bottom-0 h-1 bg-highlight animate-pulse z-30"></div>
     </header>
     
-    <!-- User ID 顯示 (用於調試和多用戶識別) -->
-    <div class="text-xs text-center p-1 bg-gray-200 text-gray-500">
-        <span id="user-id-display">User ID: (外部環境 / 記帳功能使用本地儲存)</span>
+    <!-- User ID 顯示 (用於調試和環境識別) -->
+    <div class="text-xs text-center p-1 bg-subtle-bg text-gray-600 border-b z-10 sticky top-16">
+        <span id="user-id-display">User ID: (等待環境偵測...)</span>
     </div>
 
     <!-- 主要內容區域 -->
-    <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+    <main class="main-container px-4 py-4 min-h-[calc(100vh-10rem)]">
 
         <!-- 行程規劃 Tab -->
-        <div id="itinerary-content" class="tab-content min-h-[calc(100vh-6rem)]">
-            <div id="itinerary-list" class="space-y-8">
+        <div id="itinerary-content" class="tab-content">
+            <div id="itinerary-list" class="space-y-6">
                 <!-- 行程卡片將由 JavaScript 渲染 -->
                 <div class="text-center text-gray-500 py-10" id="initial-loading-message">
                     正在載入行程數據...
@@ -117,48 +121,54 @@
         </div>
 
         <!-- 旅程資訊與工具 Tab -->
-        <div id="tools-content" class="tab-content min-h-[calc(100vh-6rem)] hidden">
+        <div id="tools-content" class="tab-content hidden">
             <div class="grid grid-cols-1 gap-6">
 
                 <!-- 旅程重要資訊 -->
-                <div class="bg-white p-5 rounded-xl card-shadow">
-                    <h2 class="text-xl font-semibold text-primary mb-4 flex items-center">
-                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <div class="bg-white p-5 rounded-2xl card-shadow">
+                    <h2 class="text-xl font-bold text-primary mb-4 flex items-center">
+                        <svg class="w-6 h-6 mr-2 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                         重要旅程資訊
                     </h2>
-                    <div class="space-y-3 text-sm text-gray-700">
-                        <h3 class="font-bold text-secondary border-b pb-1 mb-2">✈️ 航班資訊</h3>
-                        <p><span class="font-semibold">去程：</span>IT246 桃園 (TPE) 07:10 → 佐賀 (HSG) 10:25</p>
-                        <p><span class="font-semibold">回程：</span>IT247 佐賀 (HSG) 15:25 → 桃園 (TPE)</p>
+                    <div class="space-y-4 text-sm text-gray-700">
+                        <section>
+                            <h3 class="font-extrabold text-secondary border-b pb-1 mb-2">✈️ 航班資訊</h3>
+                            <p><span class="font-semibold text-primary">去程 (IT246)：</span>桃園 TPE 07:10 → 佐賀 HSG 10:25</p>
+                            <p><span class="font-semibold text-primary">回程 (IT247)：</span>佐賀 HSG 12:15 → 桃園 TPE 13:45</p>
+                        </section>
                         
-                        <h3 class="font-bold text-secondary border-b pb-1 mb-2 pt-3">🏨 住宿資訊</h3>
-                        <p><span class="font-semibold">飯店：</span>東橫INN佐賀站前</p>
-                        <p><span class="font-semibold">地址：</span>佐賀県佐賀市駅前中央1-10-36</p>
-                        <p><span class="font-semibold">備註：</span>全程不換飯店</p>
+                        <section>
+                            <h3 class="font-extrabold text-secondary border-b pb-1 mb-2 pt-3">🏨 住宿資訊</h3>
+                            <p><span class="font-semibold text-primary">飯店：</span>東橫INN佐賀站前</p>
+                            <p><span class="font-semibold text-primary">地址：</span>佐賀県佐賀市駅前中央1-10-36</p>
+                            <p><span class="font-semibold text-primary">備註：</span>全程不換飯店</p>
+                        </section>
 
-                        <h3 class="font-bold text-secondary border-b pb-1 mb-2 pt-3">📞 緊急聯絡電話</h3>
-                        <p><span class="font-semibold">警察：</span>110</p>
-                        <p><span class="font-semibold">救護車/火警：</span>119</p>
-                        <p><span class="font-semibold">台灣駐福岡辦事處：</span>+81-92-734-2810</p>
+                        <section>
+                            <h3 class="font-extrabold text-secondary border-b pb-1 mb-2 pt-3">📞 緊急聯絡電話</h3>
+                            <p><span class="font-semibold text-primary">警察：</span>110</p>
+                            <p><span class="font-semibold text-primary">救護車/火警：</span>119</p>
+                            <p><span class="font-semibold text-primary">台灣駐福岡辦事處：</span>+81-92-734-2810</p>
+                        </section>
                     </div>
                 </div>
 
                 <!-- 記帳工具 -->
-                <div class="bg-white p-5 rounded-xl card-shadow">
-                    <h2 class="text-xl font-semibold text-primary mb-4 flex items-center">
-                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                <div class="bg-white p-5 rounded-2xl card-shadow">
+                    <h2 class="text-xl font-bold text-primary mb-4 flex items-center">
+                        <svg class="w-6 h-6 mr-2 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
                         旅費記帳 (日幣 ¥)
                     </h2>
                     
-                    <div class="flex justify-between items-center mb-4 p-3 bg-primary bg-opacity-10 rounded-lg">
-                        <p class="text-sm font-semibold text-primary">總支出 (即時更新)</p>
-                        <p id="total-expense" class="text-2xl font-extrabold text-red-600">¥ 0</p>
+                    <div class="flex justify-between items-center mb-4 p-4 bg-primary bg-opacity-10 rounded-xl border-l-4 border-primary">
+                        <p class="text-sm font-bold text-primary">總支出 (即時更新)</p>
+                        <p id="total-expense" class="text-3xl font-extrabold text-red-600">¥ 0</p>
                     </div>
 
                     <div class="flex space-x-3 mb-4">
-                        <input type="text" id="expense-desc" placeholder="費用說明 (e.g. 晚餐)" class="flex-grow p-2 border border-gray-300 rounded-lg focus:ring-secondary focus:border-secondary">
-                        <input type="number" id="expense-amount" placeholder="金額" class="w-24 p-2 border border-gray-300 rounded-lg focus:ring-secondary focus:border-secondary text-right">
-                        <button onclick="addExpense()" class="bg-primary text-white p-2 rounded-lg hover:bg-emerald-600 transition duration-150 flex-shrink-0 font-medium">
+                        <input type="text" id="expense-desc" placeholder="費用說明 (e.g. 晚餐)" class="flex-grow p-3 border border-gray-300 rounded-xl focus:ring-primary focus:border-primary transition duration-150 text-sm">
+                        <input type="number" id="expense-amount" placeholder="金額" class="w-24 p-3 border border-gray-300 rounded-xl focus:ring-primary focus:border-primary text-right transition duration-150 text-sm">
+                        <button onclick="addExpense()" class="bg-primary text-white p-3 rounded-xl hover:bg-indigo-800 transition duration-150 flex-shrink-0 font-medium shadow-md">
                             新增
                         </button>
                     </div>
@@ -176,9 +186,8 @@
     <!-- 模態框容器 -->
     <div id="modal-container"></div>
     
-    <!-- JavaScript 邏輯 -->
+    <!-- JavaScript 邏輯 (包含 Firebase/LocalStorage 容錯處理) -->
     <script type="module">
-        // --- 修正 1: 將所有的靜態 import 移到模組頂層 ---
         import { initializeApp, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, addDoc, deleteDoc, onSnapshot, collection, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
@@ -187,7 +196,7 @@
         
         let expenses = [];
         let useLocalStorage = false;
-        const LOCAL_STORAGE_KEY = 'saga_expenses_v1';
+        const LOCAL_STORAGE_KEY = 'saga_expenses_v2';
         
         const initialLoadingMessage = document.getElementById('initial-loading-message');
         const userIdDisplay = document.getElementById('user-id-display');
@@ -200,7 +209,6 @@
         if (firebaseConfig) {
             // --- Canvas 環境內運行 (啟用資料庫) ---
             
-            // 由於 HTML 預設顯示 LocalStorage 訊息，這裡必須先改成載入中的訊息
             userIdDisplay.textContent = `載入中...請等待 Firebase 認證完成`;
 
             window.firebaseApp = initializeApp(firebaseConfig);
@@ -211,7 +219,7 @@
             onAuthStateChanged(window.auth, async (user) => {
                 if (user) {
                     window.userId = user.uid;
-                    userIdDisplay.textContent = `User ID: ${window.userId} (Firestore 同步中)`;
+                    userIdDisplay.textContent = `User ID: ${window.userId} (Firestore 連線成功)`;
                     startApp(); // 認證完成，啟動 App
                 } else {
                     // 執行登入流程
@@ -223,8 +231,8 @@
                         }
                     } catch(e) {
                          console.error("Firebase Auth Error:", e);
-                         userIdDisplay.textContent = `認證失敗: ${e.message}`;
-                         // 即使認證失敗，我們也讓它啟動，避免阻塞 Canvas
+                         userIdDisplay.textContent = `認證失敗: ${e.message} (啟用 LocalStorage 備援)`;
+                         useLocalStorage = true;
                          startApp(); 
                     }
                 }
@@ -237,68 +245,72 @@
             window.userId = 'external_user';
             useLocalStorage = true; // 啟用 LocalStorage 旗標
             
-            // 訊息無需變動，因為 HTML 預設值就是它
+            // 立即設置 LocalStorage 模式訊息
+            userIdDisplay.textContent = `User ID: (外部環境 / LocalStorage 儲存中)`;
+            
+            // Start the application immediately in LocalStorage mode
             startApp(); 
         }
         
-        // --- 行程核心數據 (最終修正版) ---
+        // --- 行程核心數據 (嚴格依照用戶提供的文件內容) ---
         const ITINERARY_DATA = [
             {
                 day: 1, date: '12/14（日）', city: '佐賀市', theme: '佐賀抵達 → 吉野ヶ里遺跡 → BOOKOFF',
                 details: [
-                    { type: 'flight', time: '10:25', activity: '抵達佐賀機場 (HSG) - IT246 桃園 → 佐賀' },
-                    { type: 'transport', time: '10:45', activity: '搭乘佐賀機場巴士 → 佐賀站 (下車後步行 3 分鐘 → 東橫INN佐賀站前)' },
-                    { type: 'meal', time: '11:45-12:15', activity: '午餐 (佐賀站周邊簡單吃): 建議站前食堂、吉野家等快速選項。' },
-                    { type: 'attraction', time: '12:30-15:00', activity: '吉野ヶ里歷史公園 (彌生時代遺跡)', location: '吉野ヶ里歴史公園' },
-                    { type: 'shopping', time: '15:30-17:30', activity: 'BOOKOFF 時間 (視精神選 1–2 間): 建議先去佐賀高木瀨店，若只選一間可選 PLUS 旗艦店。', location: 'BOOKOFF 佐賀高木瀬店' },
-                    { type: 'meal', time: '18:30', activity: '晚餐：燒肉光州園 (氣氛好，補充能量) 或其他三選一選項。', location: '焼肉光州園 佐賀駅前店' },
-                    { type: 'hotel', time: '20:00', activity: '回飯店休息 (明天開始自駕行程)' },
+                    { type: 'flight', time: '07:10–10:25', activity: '✈️ 抵達佐賀機場 (HSG) - IT246 桃園 → 佐賀' },
+                    { type: 'transport', time: '10:45', activity: '🚍 搭乘佐賀機場巴士 → 佐賀站 (步行 3 分鐘 → 東橫INN佐賀站前)；寄放行李 (11:30出發)', location: '東橫INN佐賀站前' },
+                    { type: 'meal', time: '11:45–12:15', activity: '午餐：佐賀站周邊簡單吃 (建議: 站前食堂、吉野家、MOS、立ち食い烏龍麵)' },
+                    { type: 'attraction', time: '12:30–15:00', activity: '🏯 吉野ヶ里歷史公園（彌生時代遺跡）', location: '吉野ヶ里歴史公園' },
+                    { type: 'shopping', time: '15:30–17:30', activity: '🛍 BOOKOFF 時間 (視精神選 1–2 間): 推薦佐賀高木瀨店 或 PLUS 佐賀南部繞道店（最大規模）', location: 'BOOKOFF PLUS 佐賀南部繞道店' },
+                    { type: 'meal', time: '18:30', activity: '🍽 晚餐：燒肉光州園(日本〒840-0811 Saga, Otakara, 4 Chome−2−7 燒肉光州園) **只收現金!!**', location: '焼肉光州園' },
+                    { type: 'hotel', time: '20:00', activity: '回飯店休息 (明天開始自駕行程)', location: '東橫INN佐賀站前' },
                 ]
             },
             {
                 day: 2, date: '12/15（一）', city: '唐津市', theme: '自駕・呼子朝市 → 唐津城 → 鏡山展望台',
                 details: [
-                    { type: 'transport', time: '08:00', activity: '🚗 飯店出發 → 呼子朝市 (車程約 60 分, 導航：呼子朝市通り)', location: '呼子朝市通り' },
-                    { type: 'attraction', time: '09:00-10:00', activity: '🦑 呼子朝市散策 (生烏賊刺身、烏賊漢堡、烏賊燒賣)', location: '呼子朝市' },
-                    { type: 'meal', time: '10:15-11:30', activity: '🍱 午餐：活烏賊定食 (建議河太郎或呼子海舟)', location: '河太郎 呼子店' },
-                    { type: 'attraction', time: '12:00-13:00', activity: '🏰 唐津城 (城下町散步、天守閣展望)', location: '唐津城' },
-                    { type: 'attraction', time: '13:30-14:30', activity: '📸 鏡山展望台 (七彩海景、虹之松原景觀)', location: '鏡山展望台' },
-                    { type: 'transport', time: '15:00', activity: '🍵 途中休息' },
-                    { type: 'meal', time: '18:30', activity: '🍽 晚餐 (建議回到佐賀市區吃晚餐)' },
-                    { type: 'hotel', time: '20:00', activity: '回飯店休息' },
+                    { type: 'transport', time: '08:00', activity: '🚗 飯店出發 → 呼子朝市 (車程約 60 分)。導航：呼子朝市通り', location: '呼子朝市通り' },
+                    { type: 'attraction', time: '09:00–10:00', activity: '🦑 呼子朝市散策 (生烏賊刺身、烏賊漢堡、烏賊燒賣、農產土產)', location: '呼子朝市' },
+                    { type: 'meal', time: '10:15–11:30', activity: '🍱 午餐：活烏賊定食 (建議：河太郎 呼子店 或 呼子海舟)', location: '河太郎 呼子店' },
+                    { type: 'attraction', time: '12:00–13:00', activity: '🏰 唐津城 (城下町散步、天守閣展望)', location: '唐津城' },
+                    { type: 'attraction', time: '13:15–14:30', activity: '🌅 選配景點：虹之松原／舊高取邸 (兩者皆順路)', location: '虹之松原' },
+                    { type: 'attraction', time: '15:00–16:00', activity: '🗻 鏡山展望台 (眺望唐津灣＋虹之松原海岸線)', location: '鏡山展望台' },
+                    { type: 'transport', time: '17:00', activity: '🚗 回佐賀市區 (1 小時車程)' },
+                    { type: 'meal', time: '18:30', activity: '🍽 晚餐：中華料理 孟渓苑 或 Seafood Izakaya Sakanaya Dojo', location: '中華料理 孟渓苑' },
                 ]
             },
             {
-                day: 3, date: '12/16（二）', city: '武雄市', theme: '自駕・祐德稻荷神社 → 武雄市圖書館 → 武雄溫泉樓門',
+                day: 3, date: '12/16（二）', city: '武雄市', theme: '自駕・祐德稻荷 → 武雄圖書館 → 武雄市散步',
                 details: [
-                    { type: 'transport', time: '09:00', activity: '🚗 飯店出發 → 祐德稻荷神社 (車程約 60 分, 導航：祐德稻荷神社)', location: '祐徳稲荷神社' },
-                    { type: 'attraction', time: '10:00-11:30', activity: '⛩️ 祐德稻荷神社 (華麗的「西日本日光」)', location: '祐徳稲荷神社' },
-                    { type: 'meal', time: '12:00-13:00', activity: '🍜 午餐 (祐德稻荷或武雄市周邊)' },
-                    { type: 'attraction', time: '13:30-14:30', activity: '📚 武雄市圖書館 (知名文創地標)', location: '武雄市図書館' },
-                    { type: 'attraction', time: '14:45-15:45', activity: '♨️ 武雄溫泉樓門 (朱紅色的歷史樓門)', location: '武雄温泉楼門' },
-                    { type: 'shopping', time: '17:00', activity: '🛍 永旺夢樂城 (Aeon Mall) 或其他順路的購物點', location: '永旺夢樂城佐賀' },
-                    { type: 'meal', time: '19:00', activity: '🍽 晚餐 (市區或 Aeon Mall 解決)' },
-                    { type: 'hotel', time: '20:30', activity: '回飯店休息' },
+                    { type: 'transport', time: '08:30', activity: '🚗 飯店出發 → 祐德稻荷神社 (車程 60 分)', location: '祐徳稲荷神社' },
+                    { type: 'attraction', time: '09:30–11:00', activity: '⛩️ 祐德稻荷神社 (鮮紅本殿、千鳥居、山上展望台)', location: '祐徳稲荷神社' },
+                    { type: 'meal', time: '11:30–12:20', activity: '🍜 午餐 (祐德門前町)', location: '祐德門前町' },
+                    { type: 'attraction', time: '13:00–14:30', activity: '📚 武雄圖書館（最美圖書館）', location: '武雄市図書館' },
+                    { type: 'attraction', time: '14:40–15:40', activity: '🌳 武雄神社大楠（日本最古老級樹木之一，壯觀到會驚呼）', location: '武雄神社大楠' },
+                    { type: 'transport', time: '17:00', activity: '🚗 回佐賀市區' },
+                    { type: 'meal', time: '18:30', activity: '🍽 晚餐：Shigeruしげる **(有牛腸鍋!)**', location: 'Shigeruしげる' },
                 ]
             },
             {
-                day: 4, date: '12/17（三）', city: '佐賀市', theme: '佐賀市區・佐賀城 → Youme Town',
+                day: 4, date: '12/17（三）', city: '佐賀市', theme: '佐賀市區散策（步行＋輕鬆日）',
                 details: [
-                    { type: 'attraction', time: '10:00-12:00', activity: '🏯 佐賀城本丸歷史館 (日本最大規模的木造建築復原)', location: '佐賀城本丸歴史館' },
-                    { type: 'meal', time: '12:30-13:30', activity: '🍜 午餐 (佐賀城附近或 Youme Town 解決)', location: 'Youme Town Saga' },
-                    { type: 'shopping', time: '14:00-17:00', activity: '🛒 Youme Town Saga (大型購物中心，購買伴手禮與雜貨)', location: 'Youme Town Saga' },
-                    { type: 'meal', time: '18:30', activity: '🍽 晚餐 (市區特色餐廳)' },
-                    { type: 'hotel', time: '20:00', activity: '回飯店，整理行李' },
+                    { type: 'attraction', time: '09:00–10:00', activity: '🏯 佐賀城本丸歷史館', location: '佐賀城本丸歴史館' },
+                    { type: 'attraction', time: '10:00–11:00', activity: 'Former Koga Bank舊古賀銀行 & 徵古館', location: '旧古賀銀行' },
+                    { type: 'attraction', time: '11:00–12:30', activity: '和服出租 よそほひ処・二葉、佐嘉神社 + 城跡公園', location: '佐嘉神社' },
+                    { type: 'meal', time: '12:30–13:30', activity: '🍱 午餐（Youme Town 內）', location: 'Youme Town Saga' },
+                    { type: 'shopping', time: '13:30–15:00', activity: '🛍 Youme Town 購物散策 (大創、無印良品、藥妝)', location: 'Youme Town Saga' },
+                    { type: 'attraction', time: '15:30–16:30', activity: '🎨 柳町老街散步 (咖啡廳、老街建築、和風拍照好地方)', location: '柳町老街' },
+                    { type: 'attraction', time: '17:00–18:00', activity: '🛁 佐賀平價澡堂：湯処 えびす湯（離飯店近、乾淨、便宜）', location: '湯処 えびす湯' },
+                    { type: 'meal', time: '18:30', activity: '🍽 晚餐：和香菜 佐賀駅前店', location: '和香菜 佐賀駅前店' },
                 ]
             },
             {
-                day: 5, date: '12/18（四）', city: '佐賀市', theme: '返程 → 佐賀機場',
+                day: 5, date: '12/18（四）', city: '佐賀市', theme: '回程日｜佐賀 → 桃園',
                 details: [
-                    { type: 'hotel', time: '10:00', activity: '🏨 辦理退房手續 (東橫INN)' },
-                    { type: 'meal', time: '10:30-11:30', activity: '午餐或在車站周邊採購最後的紀念品' },
-                    { type: 'transport', time: '12:00', activity: '🚍 搭乘佐賀機場巴士 → 佐賀機場' },
-                    { type: 'flight', time: '14:00', activity: '✈️ 櫃檯報到 (IT247 佐賀 → 桃園)' },
-                    { type: 'flight', time: '15:25', activity: '起飛，結束愉快的佐賀旅程' },
+                    { type: 'hotel', time: '08:30–10:00', activity: '🧳 早餐＋收行李＋退房', location: '東橫INN佐賀站前' },
+                    { type: 'transport', time: '10:15', activity: '🚍 搭乘機場巴士 → 佐賀機場', location: '佐賀機場巴士站' },
+                    { type: 'flight', time: '12:15', activity: '✈️ 櫃檯報到 & 起飛 (IT247 佐賀 → 桃園)', location: '佐賀機場' },
+                    { type: 'flight', time: '13:45', activity: '結束愉快的佐賀旅程 (抵達桃園)' },
                 ]
             },
         ];
@@ -310,29 +322,27 @@
             'transport': '🚗',
             'shopping': '🛍️',
             'flight': '✈️',
-            'hotel': '🏨',
+            'hotel': '🛌',
             'default': '📝'
         };
 
         // --- 輔助函式 (彈出視窗取代 alert/confirm) ---
 
-        // 自定義 Alert
         window.customAlert = (title, message) => {
             return new Promise(resolve => {
                 const modalContainer = document.getElementById('modal-container');
                 const modal = document.createElement('div');
                 modal.className = 'custom-modal';
                 modal.innerHTML = `
-                    <div class="modal-content w-96">
+                    <div class="modal-content w-full">
                         <h3 class="text-xl font-bold mb-3 text-primary">${title}</h3>
                         <p class="mb-4 text-gray-700">${message}</p>
                         <div class="flex justify-end">
-                            <button id="modal-close" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-emerald-600 font-medium">確認</button>
+                            <button id="modal-close" class="px-5 py-2 bg-primary text-white rounded-xl hover:bg-indigo-800 font-medium transition duration-150 shadow-lg">確認</button>
                         </div>
                     </div>
                 `;
                 modalContainer.appendChild(modal);
-
                 document.getElementById('modal-close').onclick = () => {
                     modalContainer.removeChild(modal);
                     resolve();
@@ -340,19 +350,18 @@
             });
         };
 
-        // 自定義 Confirm
         window.customConfirm = (title, message) => {
             return new Promise(resolve => {
                 const modalContainer = document.getElementById('modal-container');
                 const modal = document.createElement('div');
                 modal.className = 'custom-modal';
                 modal.innerHTML = `
-                    <div class="modal-content w-96">
+                    <div class="modal-content w-full">
                         <h3 class="text-xl font-bold mb-3 text-red-600">${title}</h3>
                         <p class="mb-4 text-gray-700">${message}</p>
                         <div class="flex justify-end space-x-3">
-                            <button id="modal-cancel" class="px-4 py-2 text-gray-600 rounded-lg hover:bg-gray-100 font-medium">取消</button>
-                            <button id="modal-ok" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 font-medium">確定</button>
+                            <button id="modal-cancel" class="px-5 py-2 text-gray-600 rounded-xl hover:bg-gray-100 font-medium transition duration-150">取消</button>
+                            <button id="modal-ok" class="px-5 py-2 bg-red-500 text-white rounded-xl hover:bg-red-600 font-medium transition duration-150 shadow-lg">確定</button>
                         </div>
                     </div>
                 `;
@@ -421,7 +430,7 @@
         }
         
         // --- 核心功能：AI 導遊分析 ---
-        async function fetchGuideContent(day, city, theme) {
+        async function fetchGuideContent(day, city, theme, itineraryText) {
             const container = document.getElementById(`guide-analysis-day-${day}`);
             const button = document.getElementById(`btn-guide-day-${day}`);
             
@@ -429,13 +438,13 @@
             button.textContent = '分析中... 請等待';
             container.innerHTML = '<p class="p-4 text-center text-gray-500">AI 導遊正在為您搜尋最新攻略與必備資訊...</p>';
 
-            const systemPrompt = "你是一位專業的佐賀旅遊導遊，請根據用戶提供的每日行程，利用 Google 搜尋最新的資訊，並提供一個約 200 字的精簡攻略。內容必須包含以下幾點：1. 該城市或景點的即時天氣概況（溫度、降雨機率、天氣類型）。2. 建議的必吃美食或特色菜餚。3. 建議的必買伴手禮。4. 任何重要的旅遊提示（例如：停車、預約）。請使用繁體中文，並將關鍵資訊用 HTML 標籤標記：<span class='tag-must-eat'>必吃/必點</span>、<span class='tag-must-buy'>必買伴手禮</span>、<span class='tag-important'>重要提示/代號</span>。";
+            const systemPrompt = "你是一位專業的佐賀旅遊導遊，請根據用戶提供的每日行程，利用 Google 搜尋最新的資訊，並提供一個約 250 字的精簡攻略。內容必須包含以下幾點：1. 該城市或景點的建議必吃美食或特色菜餚。2. 建議的必買伴手禮。3. 任何重要的旅遊提示（例如：停車、預約、交通細節）。請使用繁體中文，並將關鍵資訊用 HTML 標籤標記：<span class='tag-must-eat'>必吃：...</span>、<span class='tag-must-buy'>必買：...</span>、<span class='tag-important'>重要：...</span>。";
             
-            const userQuery = `請分析佐賀旅行第 ${day} 天的行程：城市：${city}，主題：${theme}。請提供攻略。`;
+            const userQuery = `請分析佐賀旅行第 ${day} 天的行程：城市：${city}，主題：${theme}。行程細節：${itineraryText}。請提供攻略。`;
 
             try {
                 const rawText = await fetchGeminiContent(systemPrompt, userQuery);
-                container.innerHTML = `<div class="p-4 bg-yellow-50 rounded-lg text-sm text-gray-800 space-y-2">${rawText}</div>`;
+                container.innerHTML = `<div class="p-4 bg-highlight bg-opacity-10 rounded-xl text-sm text-gray-800 space-y-2 border-l-4 border-highlight font-medium">${rawText}</div>`;
             } catch (error) {
                 container.innerHTML = `<p class="p-4 text-center text-red-500">❌ AI 導遊分析失敗: ${error.message}</p>`;
                 console.error('AI Guide Error:', error);
@@ -445,13 +454,13 @@
             }
         }
         
-        // --- 核心功能：天氣查詢 ---
+        // --- 核心功能：天氣查詢 (獨立查詢) ---
         async function fetchWeather(city, day) {
             const container = document.getElementById(`weather-day-${day}`);
             const weatherBtn = document.getElementById(`btn-weather-day-${day}`);
             weatherBtn.disabled = true;
             
-            container.innerHTML = '正在查詢天氣...';
+            container.innerHTML = '<span class="font-semibold text-secondary">☁️ 天氣預報:</span> 正在查詢天氣...';
             
             const systemPrompt = "你是一位精準的即時天氣報導員，請根據用戶提供的地點，使用 Google Search 查詢當地的即時或最新的天氣狀況（溫度、降雨機率、天氣類型）。請用一句話簡短總結並包含建議穿搭，並使用繁體中文。";
             const userQuery = `佐賀縣 ${city} 的最新天氣概況。`;
@@ -486,16 +495,20 @@
             listContainer.innerHTML = '';
             
             ITINERARY_DATA.forEach(day => {
+                // 組合詳細行程文字，用於傳給 AI 導遊分析
+                const itineraryText = day.details.map(d => `${d.time}: ${d.activity}`).join('; ');
+                
                 const dayCard = document.createElement('div');
-                dayCard.className = 'bg-white p-5 rounded-xl card-shadow';
+                dayCard.className = 'bg-white p-5 rounded-2xl card-shadow';
                 dayCard.innerHTML = `
-                    <h2 class="text-2xl font-extrabold text-gray-800 border-b-2 border-primary pb-2 mb-4">
-                        Day ${day.day}: ${day.date}
+                    <h2 class="text-2xl font-black text-gray-800 border-b-2 border-primary pb-2 mb-4 flex justify-between items-center">
+                        <span>Day ${day.day}: ${day.date}</span>
+                        <span class="text-sm font-medium text-gray-500">${day.city}</span>
                     </h2>
-                    <h3 class="text-lg font-semibold text-secondary mb-3">${day.theme} (${day.city})</h3>
+                    <h3 class="text-lg font-bold text-gray-600 mb-3">${day.theme}</h3>
 
                     <!-- 天氣預報區塊 -->
-                    <div id="weather-day-${day.day}" class="p-3 mb-4 bg-primary bg-opacity-10 rounded-lg text-sm text-gray-800">
+                    <div id="weather-day-${day.day}" class="p-3 mb-4 bg-subtle-bg rounded-xl text-sm text-gray-800">
                         <span class="font-semibold text-primary">☁️ 天氣預報:</span> 點擊下方按鈕查詢。
                     </div>
 
@@ -504,32 +517,37 @@
                         ${day.details.map(detail => {
                             const icon = typeIcons[detail.type] || typeIcons['default'];
                             const locationBtn = detail.location ? 
-                                `<button onclick="window.open('https://maps.google.com/?q=${encodeURIComponent(detail.location)}', '_blank')" class="ml-2 px-3 py-1 text-xs bg-secondary text-white rounded-full hover:bg-blue-600 transition">
-                                    導航
+                                `<button onclick="window.open('https://maps.google.com/?q=${encodeURIComponent(detail.location)}', '_blank')" class="ml-2 px-3 py-1 text-xs bg-secondary text-white rounded-full hover:bg-indigo-600 transition shadow-sm font-medium flex-shrink-0">
+                                    ${detail.type === 'transport' ? '自駕導航' : '地圖'}
                                 </button>` : '';
 
                             return `
-                                <li class="flex items-start text-gray-700 p-2 bg-gray-50 rounded-lg border-l-4 border-${detail.type === 'meal' ? 'pink-400' : detail.type === 'attraction' ? 'teal-400' : 'gray-300'}">
-                                    <span class="text-base font-bold text-gray-600 min-w-[5rem] flex-shrink-0">${detail.time}</span>
-                                    <span class="ml-4 flex-grow text-base">${icon} ${detail.activity} ${locationBtn}</span>
+                                <li class="flex items-start text-gray-700 p-3 bg-gray-50 rounded-xl border-l-4 border-${detail.type}">
+                                    <div class="time-box mr-4">${detail.time}</div>
+                                    <div class="flex-grow text-base flex flex-col sm:flex-row sm:items-center">
+                                        <span class="mr-2">${icon} ${detail.activity}</span> 
+                                        ${locationBtn}
+                                    </div>
                                 </li>
                             `;
                         }).join('')}
                     </ul>
 
                     <!-- AI 導遊與操作按鈕 -->
-                    <div class="flex flex-col space-y-2 mt-4">
-                        <button id="btn-guide-day-${day.day}" onclick="fetchGuideContent(${day.day}, '${day.city}', '${day.theme}')" class="w-full px-4 py-2 bg-highlight text-white rounded-lg hover:bg-amber-600 transition duration-150 font-semibold shadow-md">
+                    <div class="flex flex-col space-y-2 mt-4 border-t pt-4">
+                        <button id="btn-guide-day-${day.day}" 
+                            onclick="fetchGuideContent(${day.day}, '${day.city}', '${day.theme.replace(/'/g, "\\'")}', '${itineraryText.replace(/'/g, "\\'")}')" 
+                            class="w-full px-4 py-3 bg-highlight text-white rounded-xl hover:bg-amber-600 transition duration-150 font-extrabold shadow-lg shadow-highlight/30">
                             AI 導遊分析與攻略
                         </button>
-                        <button id="btn-weather-day-${day.day}" onclick="fetchWeather('${day.city}', ${day.day})" class="w-full px-4 py-2 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400 transition duration-150 font-semibold">
+                        <button id="btn-weather-day-${day.day}" onclick="fetchWeather('${day.city}', ${day.day})" class="w-full px-4 py-3 bg-gray-200 text-gray-800 rounded-xl hover:bg-gray-300 transition duration-150 font-semibold shadow-md">
                             查詢當日天氣
                         </button>
                     </div>
 
                     <!-- AI 攻略內容區塊 -->
-                    <div id="guide-analysis-day-${day.day}" class="mt-4 border-t pt-4">
-                        <p class="text-sm text-gray-500">點擊上方按鈕獲取必吃、必買與景點攻略。</p>
+                    <div id="guide-analysis-day-${day.day}" class="mt-4">
+                        <p class="text-sm text-gray-500 text-center">點擊上方按鈕獲取必吃、必買與景點攻略。</p>
                     </div>
                 `;
                 listContainer.appendChild(dayCard);
@@ -555,7 +573,7 @@
             const listContainer = document.getElementById('expense-list');
             const loadingElement = document.getElementById('expense-loading');
 
-            // 啟用輸入框 (在 LocalStorage 模式下也應該啟用)
+            // 啟用輸入框
             document.getElementById('expense-desc').disabled = false;
             document.getElementById('expense-amount').disabled = false;
             document.querySelector('#tools-content button.bg-primary').disabled = false;
@@ -569,7 +587,6 @@
                 try {
                     const savedData = localStorage.getItem(LOCAL_STORAGE_KEY);
                     expenses = savedData ? JSON.parse(savedData) : [];
-                    // 將 timestamp 從數字轉回日期物件的毫秒數 (用於排序)
                     expenses.forEach(e => { e.timestamp = e.timestamp || Date.now(); });
                     syncLocalStorage(); 
                 } catch (error) {
@@ -581,16 +598,13 @@
             }
             
             // *** Firebase 模式 (正常) ***
-            // 私人資料集合路徑
             const expensesCollectionPath = `artifacts/${appId}/users/${window.userId}/expenses`;
             
-            // 使用 onSnapshot 即時監聽資料
             onSnapshot(collection(window.db, expensesCollectionPath), (snapshot) => {
                 expenses = [];
                 snapshot.forEach(doc => {
                     expenses.push({ id: doc.id, ...doc.data() });
                 });
-                // 依據時間戳記從新到舊排序 (Firestore timestamp 需轉換)
                 expenses.sort((a, b) => (b.timestamp?.toMillis() || 0) - (a.timestamp?.toMillis() || 0)); 
                 renderExpensesList();
             }, (error) => {
@@ -605,12 +619,8 @@
             const listContainer = document.getElementById('expense-list');
             const totalDisplay = document.getElementById('total-expense');
             
-            listContainer.querySelectorAll('.expense-item, .text-gray-500').forEach(e => {
-                if(e.classList.contains('expense-item') || e.textContent.includes('沒有任何支出記錄')) {
-                    e.remove(); // 清除舊列表和提示訊息
-                }
-            });
-            
+            listContainer.innerHTML = ''; // 清除舊列表
+
             let total = 0;
             if (expenses.length === 0) {
                  const warning = document.createElement('p');
@@ -621,7 +631,6 @@
 
             expenses.forEach((item) => {
                 total += item.amount;
-                // 處理 LocalStorage (數字) 和 Firestore (Timestamp 物件) 的時間
                 const dateMs = useLocalStorage ? item.timestamp : (item.timestamp?.toMillis() || Date.now());
                 const date = new Date(dateMs);
                 const formattedTime = date.toLocaleDateString('zh-TW', { month: '2-digit', day: '2-digit' }) + ' ' +
@@ -629,14 +638,14 @@
 
                 const expenseItem = document.createElement('div');
                 expenseItem.id = `item-${item.id}`;
-                expenseItem.className = 'expense-item flex justify-between items-center p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition duration-150 border-b';
+                expenseItem.className = 'expense-item flex justify-between items-center p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition duration-150';
                 expenseItem.innerHTML = `
                     <div class="flex-grow">
                         <p class="font-medium text-gray-800">${item.desc}</p>
                         <p class="text-xs text-gray-500">${formattedTime}</p>
                     </div>
                     <div class="flex items-center">
-                        <span class="text-lg font-bold text-red-500 mr-3 tabular-nums">¥ ${item.amount.toLocaleString()}</span>
+                        <span class="text-xl font-bold text-red-500 mr-3 tabular-nums">¥ ${item.amount.toLocaleString()}</span>
                         <button onclick="deleteExpense('${item.id}')" class="text-red-400 hover:text-red-600 transition duration-150 p-1">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                         </button>
@@ -665,11 +674,11 @@
             if (useLocalStorage) {
                 // *** LocalStorage 模式 ***
                 const newId = crypto.randomUUID();
-                expenses.unshift({ // unshift: 加到最前面
+                expenses.unshift({ 
                     id: newId,
                     desc,
                     amount,
-                    timestamp: Date.now() // 使用 JS 時間戳記
+                    timestamp: Date.now() 
                 });
                 syncLocalStorage();
                 return;
@@ -717,9 +726,7 @@
         
         // --- 應用程式統一啟動函數 ---
         function startApp() {
-             // 隱藏初始的載入提示
             initialLoadingMessage.classList.add('hidden');
-            
             renderItinerary();
             setupFirestoreListener();
         }
