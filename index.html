@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>佐賀自駕旅程指南</title>
+    <!-- 引入 Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入 Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* 使用 Inter 字體以獲得乾淨的極簡外觀 */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7f7f7; /* 輕微的米白背景 */
+        }
+        /* 自訂滾動條樣式，讓手機體驗更佳 */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+        .text-vermilion { /* 神社朱紅色調 */
+            color: #d84315;
+        }
+        .bg-vermilion-50 {
+            background-color: #fff3e0;
+        }
+        /* 隱藏未選中的分頁內容 */
+        .tab-content {
+            display: none;
+        }
+        .active-tab {
+            border-bottom: 2px solid #d84315;
+            color: #d84315;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body class="min-h-screen pb-20">
+
+    <!-- 頂部標題和分頁導航 -->
+    <div class="fixed top-0 left-0 right-0 bg-white z-10 shadow-sm border-b border-gray-200">
+        <header class="max-w-xl mx-auto p-4 flex justify-between items-center">
+            <h1 class="text-2xl font-bold text-gray-800">佐賀自駕旅程</h1>
+            <div id="date-display" class="text-sm font-medium text-gray-500"></div>
+        </header>
+
+        <!-- 分頁導航 -->
+        <nav class="flex justify-around max-w-xl mx-auto text-center text-gray-600">
+            <button class="tab-button w-1/2 py-3 transition-colors active-tab" onclick="showTab('itinerary-tab', this)">
+                <i data-lucide="map"></i> 行程規劃
+            </button>
+            <button class="tab-button w-1/2 py-3 transition-colors" onclick="showTab('tools-tab', this)">
+                <i data-lucide="wrench"></i> 實用工具
+            </button>
+        </nav>
+    </div>
+
+    <!-- 主內容區塊 (填充頂部固定導航的高度) -->
+    <main class="max-w-xl mx-auto pt-32 p-4">
+
+        <!-- 行程規劃分頁 -->
+        <div id="itinerary-tab" class="tab-content block">
+            <h2 class="text-xl font-semibold mb-4 text-gray-700">每日行程總覽</h2>
+            <div id="itinerary-list" class="space-y-6">
+                <!-- 行程卡片將由 JavaScript 生成 -->
+            </div>
+        </div>
+
+        <!-- 實用工具分頁 -->
+        <div id="tools-tab" class="tab-content hidden">
+            <h2 class="text-xl font-semibold mb-4 text-gray-700">旅途實用資訊</h2>
+
+            <!-- 資訊卡片 -->
+            <div class="space-y-6">
+
+                <!-- 航班與住宿資訊 -->
+                <div class="p-5 bg-white shadow-lg rounded-xl">
+                    <h3 class="flex items-center text-lg font-semibold mb-3 text-vermilion">
+                        <i data-lucide="plane" class="w-5 h-5 mr-2"></i> 航班與住宿
+                    </h3>
+                    <div class="space-y-3 text-sm text-gray-700">
+                        <p class="border-b pb-2">
+                            <span class="font-medium text-gray-500">住宿：</span>
+                            <span class="font-bold">東橫INN佐賀站前</span>
+                        </p>
+                        <p class="border-b pb-2">
+                            <span class="font-medium text-gray-500">地址：</span>
+                            佐賀県佐賀市駅前中央1-10-36
+                        </p>
+                        <p class="border-b pb-2">
+                            <span class="font-medium text-gray-500">去程：</span>
+                            IT246 (07:10 桃園 → 10:25 佐賀)
+                        </p>
+                        <p>
+                            <span class="font-medium text-gray-500">回程：</span>
+                            IT247 (12:15 佐賀 → 13:45 桃園)
+                        </p>
+                    </div>
+                    <!-- 預留預約代號亮顯 -->
+                    <div class="mt-4 p-3 bg-red-50 rounded-lg text-sm text-red-600 border border-red-200">
+                        <p class="font-bold">重要提醒：</p>
+                        <p>請在此處填寫您的 <span class="text-red-700 font-extrabold">機票預約代號</span> 或 <span class="text-red-700 font-extrabold">飯店訂單編號</span>，方便隨時查閱。</p>
+                    </div>
+                </div>
+
+                <!-- 緊急聯絡電話 -->
+                <div class="p-5 bg-white shadow-lg rounded-xl">
+                    <h3 class="flex items-center text-lg font-semibold mb-3 text-vermilion">
+                        <i data-lucide="phone-call" class="w-5 h-5 mr-2"></i> 緊急聯絡電話
+                    </h3>
+                    <ul class="text-sm text-gray-700 space-y-2">
+                        <li>
+                            <span class="font-medium text-gray-500">警察 (110)：</span>
+                            <a href="tel:+81110" class="text-blue-500 hover:underline">撥打 110</a>
+                        </li>
+                        <li>
+                            <span class="font-medium text-gray-500">救護車/消防 (119)：</span>
+                            <a href="tel:+81119" class="text-blue-500 hover:underline">撥打 119</a>
+                        </li>
+                        <li>
+                            <span class="font-medium text-gray-500">信用卡遺失：</span>
+                            請自行填寫銀行客服電話
+                        </li>
+                        <li>
+                            <span class="font-medium text-gray-500">駐福岡辦事處：</span>
+                            +81-92-734-2810
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- 記帳/預算表 -->
+                <div class="p-5 bg-white shadow-lg rounded-xl">
+                    <h3 class="flex items-center text-lg font-semibold mb-3 text-vermilion">
+                        <i data-lucide="wallet" class="w-5 h-5 mr-2"></i> 記帳/預算表
+                    </h3>
+                    <div class="space-y-3">
+                        <div class="flex space-x-2">
+                            <input type="text" id="expense-item" placeholder="項目 (e.g. 午餐)" class="flex-grow p-2 border border-gray-300 rounded-lg text-sm focus:ring-vermilion focus:border-vermilion" />
+                            <input type="number" id="expense-amount" placeholder="金額 (日圓)" class="w-1/3 p-2 border border-gray-300 rounded-lg text-sm focus:ring-vermilion focus:border-vermilion" />
+                            <button onclick="addExpense()" class="bg-vermilion-50 text-vermilion border border-red-200 px-4 rounded-lg font-semibold text-sm hover:bg-red-100 transition-colors flex-shrink-0">新增</button>
+                        </div>
+
+                        <div id="expense-list" class="space-y-2 max-h-48 overflow-y-auto pr-2">
+                            <!-- 費用列表 -->
+                        </div>
+
+                        <div class="pt-3 border-t-2 border-dashed border-gray-200 mt-3 flex justify-between font-bold text-gray-800">
+                            <span>總支出：</span>
+                            <span id="total-expense">0 JPY</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        // 初始化 Lucide Icons
+        lucide.createIcons();
+
+        // 載入行程資料 (已根據使用者提供的文件更新)
+        const itineraryData = [
+            {
+                day: 1,
+                date: "12/14 (日)",
+                location: "佐賀市/吉野ヶ里",
+                weather: "Saga",
+                events: [
+                    { time: "07:10-10:25", title: "✈️ 航班抵達：桃園 → 佐賀機場 (HSG)", type: "transport", note: "IT246 桃園 → 佐賀", locationName: "佐賀機場", isKey: true },
+                    { time: "10:45", title: "🚍 搭乘機場巴士至佐賀站，東橫INN寄放行李", type: "transport", locationName: "東橫INN佐賀站前", note: "下車後步行 3 分鐘。11:30 前後準備出發" },
+                    { time: "11:45-12:15", title: "午餐：佐賀站周邊簡單吃", type: "dining", locationName: "佐賀站周邊", note: "快速省時：站前食堂、吉野家、MOS、立ち食い烏龍麵", isKey: false },
+                    { time: "12:30-15:00", title: "🏯 吉野ヶ里歷史公園（彌生時代遺跡）", type: "attraction", locationName: "吉野ヶ里歴史公園", note: "交通：JR佐賀站 → 吉野ヶ里公園站 (約12分鐘)。停留重點：南內郭・北內郭等。", isKey: true },
+                    { time: "15:30-17:30", title: "🛍 BOOKOFF 時間（高木瀨店 或 PLUS 旗艦店）", type: "shopping", locationName: "BOOKOFF", note: "視精神與移動時間選 1–2 間。", guide: "<span class='font-bold text-red-700'>強烈推薦：</span>BOOKOFF PLUS 佐賀南部繞道店（最大規模旗艦店）。", isKey: true },
+                    { time: "18:30", title: "晚餐：燒肉光州園", type: "dining", locationName: "燒肉光州園", note: "地址：Saga, Otakara, 4 Chome−2−7。", guide: "<span class='font-bold text-red-700'>重要提醒：</span>只收現金!!", isKey: true },
+                    { time: "20:00", title: "🏨 回飯店休息", type: "transport", locationName: "東橫INN佐賀站前", note: "明天開始自駕行程。", isKey: false },
+                ]
+            },
+            {
+                day: 2,
+                date: "12/15 (一)",
+                location: "呼子/唐津",
+                weather: "Karatsu",
+                events: [
+                    { time: "08:00", title: "🚗 飯店出發 → 呼子朝市", type: "transport", note: "車程約 60 分。導航：呼子朝市通り。", locationName: "呼子朝市", isKey: false },
+                    { time: "09:00-10:00", title: "🦑 呼子朝市散策", type: "attraction", locationName: "呼子朝市通り", note: "生烏賊刺身、烏賊漢堡、烏賊燒賣、農產土產。", isKey: true },
+                    { time: "10:15-11:30", title: "🍱 午餐：活烏賊定食（建議）", type: "dining", locationName: "呼子", note: "名店推薦：河太郎 呼子店（需排隊）、呼子海舟（海景極佳）。", isKey: true },
+                    { time: "12:00-13:00", title: "🏰 唐津城", type: "attraction", locationName: "唐津城", note: "城下町散步、天守閣展望、佐賀武士文化展示。", guide: "<span class='font-bold text-blue-700'>停車資訊：</span>停車場在纜車旁。", isKey: true },
+                    { time: "13:15-14:30", title: "🌅 選配景點：虹之松原／舊高取邸", type: "attraction", locationName: "虹之松原/舊高取邸", note: "兩者皆順路。", isKey: false },
+                    { time: "15:00-16:00", title: "🗻 鏡山展望台", type: "attraction", locationName: "鏡山展望台", note: "停留 40 分鐘足夠。", guide: "<span class='font-bold text-green-700'>必看：</span>眺望唐津灣＋虹之松原海岸線，非常值得。", isKey: true },
+                    { time: "17:00", title: "🚗 回佐賀市區", type: "transport", locationName: "佐賀市區", note: "車程約 1 小時。", isKey: false },
+                    { time: "18:30", title: "晚餐：佐賀市區（自訂）", type: "dining", locationName: "佐賀市區", note: "選擇：中華料理 孟渓苑 或 Seafood Izakaya Sakanaya Dojo。", isKey: true },
+                ]
+            },
+            {
+                day: 3,
+                date: "12/16 (二)",
+                location: "鹿島/武雄",
+                weather: "Kashima",
+                events: [
+                    { time: "08:30", title: "🚗 飯店出發 → 祐德稻荷神社", type: "transport", note: "車程約 60 分。導航：祐德稲荷神社駐車場。", locationName: "祐德稲荷神社", isKey: false },
+                    { time: "09:30-11:00", title: "⛩️ 祐德稻荷神社", type: "attraction", locationName: "祐德稻荷神社", note: "鮮紅本殿、伏見稻荷系千鳥居、御守、開運繪馬。", guide: "<span class='font-bold text-red-700'>參拜：</span>可選爬山上展望台。", isKey: true },
+                    { time: "11:30-12:20", title: "午餐：祐德門前町", type: "dining", locationName: "祐德門前町", isKey: false },
+                    { time: "13:00-14:30", title: "📚 武雄圖書館（最美圖書館）", type: "attraction", locationName: "武雄市図書館", note: "可買咖啡休息。", guide: "<span class='font-bold text-blue-700'>導航：</span>武雄市図書館（停車位多）。", isKey: true },
+                    { time: "14:40-15:40", title: "🌳 武雄神社大楠（樹齡3000年）", type: "attraction", locationName: "武雄神社", note: "知名能量景點。大楠在神社後方。", guide: "<span class='font-bold text-green-700'>強烈推薦：</span>日本最古老級樹木之一，壯觀到會驚呼。", isKey: true },
+                    { time: "17:00", title: "🚗 回佐賀市區", type: "transport", locationName: "佐賀市區", isKey: false },
+                    { time: "18:30", title: "晚餐：Shigeru しげる", type: "dining", locationName: "Shigeru しげる", note: "地址：1 Chome-2-34 Konohigashi, Saga。", guide: "<span class='font-bold text-orange-600'>必吃：</span>有牛腸鍋!", isKey: true },
+                ]
+            },
+            {
+                day: 4,
+                date: "12/17 (三)",
+                location: "佐賀市區散策", // 根據文件，這天改為市區步行行程
+                weather: "Saga",
+                events: [
+                    { time: "09:00-10:00", title: "🏯 佐賀城本丸歷史館", type: "attraction", locationName: "佐賀城本丸歷史館", isKey: true },
+                    { time: "10:00-11:00", title: "🗾 舊古賀銀行、徵古館", type: "attraction", locationName: "佐賀歷史民俗館", note: "Former Koga Bank、徵古館", isKey: false },
+                    { time: "11:00-12:30", title: "👘 和服出租、佐嘉神社 + 城跡公園", type: "attraction", locationName: "佐嘉神社", note: "和服：よそほひ処・二葉 (4-16-203 Yanagimachi)", isKey: true },
+                    { time: "12:30-13:30", title: "午餐（Youme Town 內）", type: "dining", locationName: "Youme Town", isKey: false },
+                    { time: "13:30-15:00", title: "🛍 Youme Town 購物散策", type: "shopping", locationName: "Youme Town", guide: "<span class='font-bold text-yellow-700'>購物重點：</span>大創、無印良品、藥妝、書店等一站式完成。", isKey: true },
+                    { time: "15:30-16:30", title: "🎨 柳町老街散步", type: "attraction", locationName: "柳町老街", note: "咖啡廳、老街建築、和風拍照好地方。", isKey: false },
+                    { time: "17:00-18:00", title: "🛁 佐賀平價澡堂", type: "attraction", locationName: "湯処 えびす湯", guide: "<span class='font-bold text-blue-700'>推薦：</span>湯処 えびす湯（離飯店近、乾淨、便宜）。", isKey: false },
+                    { time: "18:30", title: "晚餐：和香菜 佐賀駅前店", type: "dining", locationName: "和香菜 佐賀駅前店", note: "在 MODE BLDG.2, 5F。", isKey: true },
+                ]
+            },
+            {
+                day: 5,
+                date: "12/18 (四)",
+                location: "佐賀 → 桃園",
+                weather: "Saga",
+                events: [
+                    { time: "08:30-10:00", title: "🧳 早餐＋收行李＋退房", type: "transport", locationName: "東橫INN佐賀站前", isKey: false },
+                    { time: "10:15", title: "🚍 搭乘機場巴士前往佐賀機場", type: "transport", locationName: "佐賀機場", isKey: false },
+                    { time: "12:15-13:45", title: "✈️ 航班返回：佐賀 → 桃園", type: "transport", note: "IT247 結束旅程。", locationName: "佐賀機場", isKey: true },
+                ]
+            }
+        ];
+
+        // --- Firebase/LocalStorage (for Budget Tracker) ---
+        // 由於我們不能使用瀏覽器的 localStorage，我將使用一個簡單的 JS 變數來模擬數據存儲，
+        // 但在實際應用中，這個部分會需要 Firestore 來實現持久化。
+        let expenses = [];
+
+        function addExpense() {
+            const itemInput = document.getElementById('expense-item');
+            const amountInput = document.getElementById('expense-amount');
+            const item = itemInput.value.trim();
+            const amount = parseInt(amountInput.value, 10);
+
+            if (item && !isNaN(amount) && amount > 0) {
+                expenses.push({ item, amount, id: Date.now() });
+                renderExpenses();
+                itemInput.value = '';
+                amountInput.value = '';
+            }
+        }
+
+        function deleteExpense(id) {
+            expenses = expenses.filter(e => e.id !== id);
+            renderExpenses();
+        }
+
+        function renderExpenses() {
+            const list = document.getElementById('expense-list');
+            const totalDisplay = document.getElementById('total-expense');
+            list.innerHTML = '';
+            let total = 0;
+
+            expenses.forEach(expense => {
+                total += expense.amount;
+                list.innerHTML += `
+                    <div class="flex justify-between items-center text-gray-700 bg-gray-50 p-2 rounded-lg border border-gray-200">
+                        <span class="text-sm">${expense.item}</span>
+                        <div class="flex items-center">
+                            <span class="font-medium mr-2">${expense.amount.toLocaleString()} JPY</span>
+                            <button onclick="deleteExpense(${expense.id})" class="text-red-500 hover:text-red-700 transition-colors">
+                                <i data-lucide="x" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            totalDisplay.textContent = `${total.toLocaleString()} JPY`;
+            lucide.createIcons(); // Re-render icons after adding content
+        }
+
+        // --- 核心功能函數 ---
+
+        // 1. 模擬天氣 API 呼叫
+        async function fetchWeatherMock(location) {
+            // 在實際應用中，您需要替換成真正的天氣 API 呼叫，並提供 API Key。
+            // 由於安全限制，這裡使用 Mock Data 來展示功能。
+            await new Promise(resolve => setTimeout(resolve, 500)); // 模擬延遲
+
+            const weatherMap = {
+                "Saga": { temp: "15°C", desc: "晴時多雲", icon: "sun", color: "text-yellow-600" },
+                "Karatsu": { temp: "12°C", desc: "局部多雲", icon: "cloud", color: "text-gray-600" },
+                "Kashima": { temp: "14°C", desc: "小雨", icon: "cloud-rain", color: "text-blue-600" },
+                "Arita": { temp: "13°C", desc: "陰天", icon: "cloud-drizzle", color: "text-gray-600" }
+            };
+
+            const data = weatherMap[location] || weatherMap["Saga"];
+            return `<div class="flex items-center text-sm font-semibold ${data.color}">
+                        <i data-lucide="${data.icon}" class="w-4 h-4 mr-1"></i>
+                        <span>${data.desc} ${data.temp}</span>
+                    </div>`;
+        }
+
+        // 2. 生成導航連結
+        function getNavigationHtml(locationName) {
+            if (!locationName) return '';
+            // 這裡使用 Google Maps 的 URL 搜尋，在手機上會自動嘗試開啟 App
+            const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent("日本佐賀 " + locationName)}`;
+            return `<a href="${mapUrl}" target="_blank" class="flex items-center justify-center space-x-1 bg-vermilion-50 text-vermilion border border-red-200 px-3 py-1 text-xs rounded-full hover:bg-red-100 transition-colors">
+                        <i data-lucide="car" class="w-4 h-4"></i>
+                        <span>導航</span>
+                    </a>`;
+        }
+
+        // 3. 生成每日行程卡片
+        async function renderItinerary() {
+            const list = document.getElementById('itinerary-list');
+            list.innerHTML = '<div class="text-center p-8 text-gray-500">正在載入行程...</div>';
+            let html = '';
+
+            for (const dayPlan of itineraryData) {
+                const weatherHtml = await fetchWeatherMock(dayPlan.weather);
+
+                html += `
+                    <div class="bg-white shadow-xl rounded-xl overflow-hidden border-t-4 border-vermilion transition-transform hover:scale-[1.005]">
+                        <!-- 日期與天氣 -->
+                        <div class="p-4 flex justify-between items-center bg-gray-50 border-b">
+                            <h3 class="text-xl font-bold text-gray-800">
+                                Day ${dayPlan.day} | ${dayPlan.date}
+                            </h3>
+                            ${weatherHtml}
+                        </div>
+                        
+                        <!-- 行程列表 -->
+                        <div class="p-4 space-y-3">
+                            ${dayPlan.events.map(event => {
+                                // 判斷圖標
+                                let icon = '';
+                                let color = 'bg-blue-100 text-blue-800';
+                                switch (event.type) {
+                                    case 'attraction': icon = 'landmark'; color = 'bg-vermilion-50 text-vermilion border border-red-200'; break;
+                                    case 'dining': icon = 'utensils'; color = 'bg-green-100 text-green-800'; break;
+                                    case 'shopping': icon = 'shopping-bag'; color = 'bg-yellow-100 text-yellow-800'; break;
+                                    case 'transport': icon = 'route'; color = 'bg-gray-200 text-gray-700'; break;
+                                }
+
+                                return `
+                                    <div class="flex items-start space-x-3 pb-3 border-b border-dashed last:border-b-0">
+                                        <!-- 時間與類型圖標 -->
+                                        <div class="flex flex-col items-center flex-shrink-0 pt-1">
+                                            <span class="text-xs font-semibold text-gray-500">${event.time}</span>
+                                            <div class="p-1 mt-1 rounded-full ${color}">
+                                                <i data-lucide="${icon}" class="w-4 h-4"></i>
+                                            </div>
+                                        </div>
+
+                                        <!-- 內容 -->
+                                        <div class="flex-grow">
+                                            <div class="flex justify-between items-center">
+                                                <p class="font-semibold text-gray-800 ${event.isKey ? 'text-lg' : 'text-base'}">${event.title}</p>
+                                                ${getNavigationHtml(event.locationName)}
+                                            </div>
+                                            
+                                            <!-- 備註 -->
+                                            ${event.note ? `<p class="text-gray-600 text-sm mt-1">${event.note}</p>` : ''}
+                                            
+                                            <!-- 導遊提醒/攻略 -->
+                                            ${event.guide ? `<div class="mt-2 p-3 bg-vermilion-50 border-l-4 border-vermilion rounded-r-lg text-sm text-gray-700">
+                                                ${event.guide}
+                                            </div>` : ''}
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+            list.innerHTML = html;
+            lucide.createIcons(); // 重新載入所有圖標
+        }
+
+        // 4. 分頁切換功能
+        function showTab(tabId, button) {
+            // 隱藏所有內容
+            document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
+            // 移除所有按鈕的 active 樣式
+            document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active-tab'));
+
+            // 顯示選中的內容
+            document.getElementById(tabId).style.display = 'block';
+            // 為選中的按鈕添加 active 樣式
+            button.classList.add('active-tab');
+            
+            // 如果切換到工具頁面，重新渲染記帳列表
+            if (tabId === 'tools-tab') {
+                renderExpenses();
+            }
+            
+            // 重新載入圖標
+            lucide.createIcons();
+        }
+
+        // 5. 顯示當前日期
+        function updateDateDisplay() {
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = (today.getMonth() + 1).toString().padStart(2, '0');
+            const day = today.getDate().toString().padStart(2, '0');
+            document.getElementById('date-display').textContent = `${year}/${month}/${day}`;
+        }
+
+        // 頁面加載完成後執行
+        window.onload = () => {
+            renderItinerary();
+            updateDateDisplay();
+            renderExpenses(); // 初始化記帳列表
+        };
+    </script>
+</body>
+</html>
